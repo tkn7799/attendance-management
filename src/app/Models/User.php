@@ -10,24 +10,32 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-    ];
+    protected $fillable = ['name', 'email', 'password', 'role'];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
+    // 定数定義
+    const ROLE_ADMIN = 1;
+    const ROLE_USER = 2;
+
+    // リレーション: 勤怠実績
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class);
+    }
+
+    // リレーション: 修正申請 (自分が申請したもの)
+    public function corrections()
+    {
+        return $this->hasMany(AttendanceCorrection::class);
+    }
+
+    // ヘルパー: 管理者かどうか
+    public function isAdmin()
+    {
+        return $this->role === self::ROLE_ADMIN;
+    }
+
     protected $hidden = [
         'password',
         'remember_token',

@@ -1,0 +1,4 @@
+!.gitkeep
+mysql/data
+mysql/log/
+mysql/conf/

@@ -1,0 +1,65 @@
+/* 基本設定 */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+    background-color: #f3f3f3;
+}
+
+/* ヘッダー全体 (黒帯の幅を60pxに固定) */
+.header {
+    background-color: #000000;
+    height: 60px;
+    padding: 0 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    overflow: hidden;
+}
+
+/* ロゴのサイズ調整 */
+.header__logo {
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+.header__logo img {
+    height: 50px;
+    width: auto;
+    object-fit: contain;
+    display: block;
+}
+
+/* ナビゲーションの配置 */
+.header-nav {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+}
+
+.header-nav__item {
+    display: flex;
+    align-items: center;
+}
+
+/* ナビゲーション（文字サイズも少し調整してバランスを取る） */
+.header-nav__link,
+.header-nav__button {
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 600;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.header-nav__link:hover,
+.header-nav__button:hover {
+    opacity: 0.7;
+}
+
+/* メインコンテンツエリア */
+main {
+    padding-top: 0;
+}

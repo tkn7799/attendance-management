@@ -1,0 +1,90 @@
+/* 背景と全体のレイアウト */
+.attendance-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 60px);
+    /* ヘッダーの高さを考慮 */
+    background-color: #f3f3f3;
+    /* 画像のような薄いグレー背景 */
+}
+
+/* ステータスバッジ (丸角の小さなタグ) */
+.attendance__status {
+    margin-bottom: 25px;
+}
+
+.status-tag {
+    background-color: #cccccc;
+    /* 画像のステータス背景色 */
+    color: #4b4b4b;
+    padding: 3px 18px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+/* 日付と時刻 */
+.attendance__info {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.attendance__date {
+    font-size: 1.8rem;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.attendance__time {
+    font-size: 5.5rem;
+    font-weight: 700;
+    color: #000;
+    line-height: 1;
+}
+
+/* ボタンの共通スタイル */
+.btn {
+    border-radius: 12px;
+    padding: 12px 60px;
+    font-size: 1.3rem;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    min-width: 180px;
+    transition: 0.2s ease;
+}
+
+/* 出勤・退勤ボタン (黒) */
+.btn--black {
+    background-color: #000000;
+    color: #ffffff;
+}
+
+/* 休憩入・戻ボタン (白・影あり) */
+.btn--white {
+    background-color: #ffffff;
+    color: #000000;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    /* 画像のような柔らかい影 */
+}
+
+.btn:hover {
+    opacity: 0.8;
+}
+
+/* ボタンが横に並ぶ設定 (退勤と休憩入) */
+.btn-group {
+    display: flex;
+    gap: 30px;
+}
+
+/* 退勤後のメッセージ */
+.attendance__message {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #000;
+    margin-top: 20px;
+}
