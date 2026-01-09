@@ -19,6 +19,9 @@ Route::get('/admin/login', function () {
     return view('admin.auth.login');
 })->middleware('guest')->name('admin.login');
 
+Route::post('/admin/login', [AuthenticatedSessionController::class, 'store'])
+    ->middleware('guest');
+
 /*
 |--------------------------------------------------------------------------
 | 一般ユーザー用ルート (要ログイン)
@@ -38,7 +41,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // 勤怠詳細画面 / 修正申請 - FN026, FN027, FN028, FN029, FN030
     Route::get('/attendance/detail/{id}', [AttendanceController::class, 'detail'])->name('attendance.detail');
-    Route::post('/attendance/detail/{id}', [AttendanceCorrectionController::class, 'store'])->name('attendance.correction.store');
+    Route::post('/attendance/detail/{id}', [AttendanceCorrectionController::class, 'store'])->name('attendance.update');
 
     // 申請一覧画面 (自分の申請) - FN031, FN032, FN033
     Route::get('/stamp_correction_request/list', [AttendanceCorrectionController::class, 'myRequestList'])->name('correction.request.list');
@@ -49,7 +52,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 | 管理者ユーザー用ルート (要管理者権限)
 |--------------------------------------------------------------------------
 */
-Route::prefix('admin')->middleware(['auth', 'can:admin'])->group(function () {
+Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
 
     // 勤怠一覧画面 (日次) - FN034, FN035, FN036
     Route::get('/attendance/list', [AdminAttendanceController::class, 'dailyList'])->name('admin.attendance.list');

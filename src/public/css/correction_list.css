@@ -1,0 +1,94 @@
+/* 全体背景 */
+body {
+    background-color: #f7f7f7;
+    color: #333;
+    font-family: 'Noto Sans JP', sans-serif;
+}
+
+.correction-list__container {
+    max-width: 1000px;
+    margin: 50px auto;
+    padding: 0 20px;
+}
+
+/* ページタイトル (左の垂直線) */
+.correction-list__title {
+    font-size: 24px;
+    font-weight: bold;
+    border-left: 5px solid #000;
+    padding-left: 15px;
+    margin-bottom: 40px;
+    line-height: 1.2;
+}
+
+/* タブメニュー */
+.tab-menu {
+    display: flex;
+    gap: 40px;
+    border-bottom: 1px solid #e0e0e0;
+    margin-bottom: 30px;
+}
+
+.tab-item {
+    padding: 10px 5px;
+    text-decoration: none;
+    color: #888;
+    font-size: 16px;
+    transition: color 0.3s;
+}
+
+.tab-item:hover {
+    color: #000;
+}
+
+/* 選択中のタブ */
+.tab-item--active {
+    color: #000;
+    font-weight: bold;
+    border-bottom: 2px solid #000;
+}
+
+/* テーブル構造 */
+.correction-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 15px;
+    /* 行間の隙間 */
+}
+
+.correction-table th {
+    text-align: left;
+    padding: 0 15px;
+    color: #888;
+    font-weight: normal;
+    font-size: 14px;
+}
+
+/* 申請行 (白いカードスタイル) */
+.correction-table tbody tr {
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    border-radius: 4px;
+}
+
+.correction-table td {
+    padding: 20px 15px;
+    font-size: 15px;
+}
+
+/* 詳細リンク */
+.detail-link {
+    color: #000;
+    font-weight: bold;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.detail-link:hover {
+    text-decoration: underline;
+}
+
+/* 状態ラベル (必要に応じて) */
+.status-label {
+    color: #333;
+}

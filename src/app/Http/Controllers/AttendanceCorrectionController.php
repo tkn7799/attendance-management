@@ -7,6 +7,7 @@ use App\Models\Attendance;
 use App\Models\AttendanceCorrection;
 use App\Models\Rest;
 use App\Models\RestCorrection;
+use App\Http\Requests\AttendanceCorrectionRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -19,22 +20,27 @@ class AttendanceCorrectionController extends Controller
             $correction = AttendanceCorrection::create([
                 'attendance_id' => $id,
                 'user_id' => Auth::id(),
-                'revised_clock_in' => $request->clock_in,
-                'revised_clock_out' => $request->clock_out,
+                'revised_clock_in' => $request->revised_clock_in,
+                'revised_clock_out' => $request->revised_clock_out,
                 'remarks' => $request->remarks,
-                'status' => AttendanceCorrection::STATUS_WAITING,
+                'status' => 0,
             ]);
 
             // 休憩の修正案も保存
-            foreach ($request->rests as $r) {
-                RestCorrection::create([
-                    'attendance_correction_id' => $correction->id,
-                    'revised_start_time' => $r['start'],
-                    'revised_end_time' => $r['end'],
-                ]);
+            if ($request->has('rest_start')) {
+                foreach ($request->rest_start as $index => $startTime) {
+                    if (!empty($startTime) && !empty($request->rest_end[$index])) {
+                        RestCorrection::create([
+                            'attendance_correction_id' => $correction->id,
+                            'revised_start_time' => $startTime,
+                            'revised_end_time' => $request->rest_end[$index],
+                        ]);
+                    }
+                }
             }
         });
-        return redirect()->route('correction.request.list');
+        return redirect()->route('attendance.detail', ['id' => $id])
+            ->with('success', '修正申請を送信しました。');
     }
 
     // 申請一覧（自分用 / 管理者用）

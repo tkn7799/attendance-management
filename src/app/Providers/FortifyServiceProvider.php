@@ -8,8 +8,10 @@ use App\Actions\Fortify\UpdateUserPassword;
 use App\Actions\Fortify\UpdateUserProfileInformation;
 use App\Http\Responses\LoginResponse;
 use App\Http\Responses\LogoutResponse;
+use App\Http\Requests\LoginRequest;
 use Laravel\Fortify\Contracts\LoginResponse as LoginResponseContract;
 use Laravel\Fortify\Contracts\LogoutResponse as LogoutResponseContract;
+use Laravel\Fortify\Http\Requests\LoginRequest as FortifyLoginRequest;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -18,7 +20,7 @@ use Illuminate\Support\Str;
 use Laravel\Fortify\Fortify;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
-us
+use Illuminate\Validation\ValidationException;
 
 class FortifyServiceProvider extends ServiceProvider
 {
@@ -30,6 +32,8 @@ class FortifyServiceProvider extends ServiceProvider
         $this->app->instance(LoginResponseContract::class, new LoginResponse);
 
         $this->app->singleton(LogoutResponseContract::class, LogoutResponse::class);
+
+        $this->app->singleton(FortifyLoginRequest::class, LoginRequest::class);
     }
 
     /**
@@ -44,11 +48,27 @@ class FortifyServiceProvider extends ServiceProvider
 
         // 一般ユーザーログイン画面
         Fortify::loginView(function () {
-            return view('auth.login');
-            if (request()->is('admin/*')) {
+            if (request()->is('admin/login')) {
                 return view('admin.auth.login');
             }
             return view('auth.login');
+        });
+
+        Fortify::authenticateUsing(function (Request $request) {
+            $user = User::where('email', $request->email)->first();
+
+            if ($user && Hash::check($request->password, $user->password)) {
+                if ($request->is('admin/login')) {
+                    if ($user->role !== 1) {
+                        throw ValidationException::withMessages([
+                            Fortify::username() => ['管理者権限がありません'],
+                        ]);
+                    }
+                }
+                return $user;
+            }
+
+            return null;
         });
 
         Fortify::createUsersUsing(CreateNewUser::class);

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Carbon\Carbon;
 
 class Attendance extends Model
@@ -13,6 +14,10 @@ class Attendance extends Model
     // ステータス定数
     const STATUS_NORMAL = 0;
     const STATUS_PENDING = 1; // 修正申請中
+
+    protected $casts = [
+        'date' => 'date',
+    ];
 
     public function user()
     {
@@ -29,6 +34,11 @@ class Attendance extends Model
     public function corrections()
     {
         return $this->hasMany(AttendanceCorrection::class);
+    }
+
+    public function correctionRequests(): HasMany
+    {
+        return $this->hasMany(AttendanceCorrection::class, 'attendance_id');
     }
 
     // 合計休憩時間を計算 (秒)

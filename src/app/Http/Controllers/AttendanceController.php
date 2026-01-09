@@ -53,9 +53,10 @@ class AttendanceController extends Controller
 
     public function list(Request $request)
     {
-        $month = $request->query('month', Carbon::today()->format('Y-m'));
+        $monthParam = $request->query('month', Carbon::today()->format('Y-m'));
+        $month = Carbon::parse($monthParam . '-01');
         $attendances = Attendance::where('user_id', Auth::id())
-            ->where('date', 'like', "$month%")
+            ->where('date', 'like', $month->format('Y-m') . '%')
             ->orderBy('date', 'asc')
             ->get();
 
@@ -64,7 +65,12 @@ class AttendanceController extends Controller
 
     public function detail($id)
     {
-        $attendance = Attendance::with('rests')->where('user_id', Auth::id())->findOrFail($id);
-        return view('attendance.detail', compact('attendance'));
+        $attendance = Attendance::findOrFail($id);
+
+        $isPending = $attendance->correctionRequests()
+            ->where('status', 1)
+            ->exists();
+
+        return view('attendance.detail', compact('attendance', 'isPending'));
     }
 }
