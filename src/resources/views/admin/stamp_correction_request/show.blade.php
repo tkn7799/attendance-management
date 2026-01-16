@@ -11,7 +11,8 @@
         <h1 class="attendance-detail__title">勤怠詳細</h1>
     </div>
 
-    <form action="{{ route('admin.correction.approve', $correction->id) }}" method="post">
+    {{-- formの送信先は、既に定義されている admin.correction.approve --}}
+    <form action="{{ route('admin.correction.approve', ['attendance_correct_request_id' => $correction->id]) }}" method="post">
         @csrf
         <div class="attendance-detail__card">
             {{-- 名前 --}}
@@ -38,9 +39,10 @@
             <div class="detail-row">
                 <div class="detail-label">出勤・退勤</div>
                 <div class="detail-content">
-                    <span class="text-data">{{ $correction->revised_clock_in }}</span>
+                    {{-- 秒をカットして H:i 形式に --}}
+                    <span class="text-data">{{ \Carbon\Carbon::parse($correction->revised_clock_in)->format('H:i') }}</span>
                     <span class="symbol">～</span>
-                    <span class="text-data">{{ $correction->revised_clock_out }}</span>
+                    <span class="text-data">{{ \Carbon\Carbon::parse($correction->revised_clock_out)->format('H:i') }}</span>
                 </div>
             </div>
 
@@ -49,9 +51,9 @@
             <div class="detail-row">
                 <div class="detail-label">休憩{{ $index + 1 }}</div>
                 <div class="detail-content">
-                    <span class="text-data">{{ $rest->revised_start_time }}</span>
+                    <span class="text-data">{{ \Carbon\Carbon::parse($rest->revised_start_time)->format('H:i') }}</span>
                     <span class="symbol">～</span>
-                    <span class="text-data">{{ $rest->revised_end_time }}</span>
+                    <span class="text-data">{{ \Carbon\Carbon::parse($rest->revised_end_time)->format('H:i') }}</span>
                 </div>
             </div>
             @endforeach
@@ -66,7 +68,12 @@
         </div>
 
         <div class="form__footer">
-            <button type="submit" class="submit-button approve-button">承認</button>
+            {{-- ステータスに応じてボタンを切り替え [FN051] --}}
+            @if($correction->status === 0)
+                <button type="submit" class="approve-button">承認</button>
+            @else
+                <button type="button" class="approve-button is-approved" disabled>承認済み</button>
+            @endif
         </div>
     </form>
 </div>

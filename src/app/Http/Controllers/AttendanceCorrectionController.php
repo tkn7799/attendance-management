@@ -10,9 +10,25 @@ use App\Models\RestCorrection;
 use App\Http\Requests\AttendanceCorrectionRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class AttendanceCorrectionController extends Controller
 {
+    public function index(Request $request)
+    {
+        $status = $request->query('tab', 'pending');
+
+        $statusNum = ($status === 'approved') ? 1 : 0;
+
+        $applications = AttendanceCorrection::with('attendance')
+            ->where('user_id', Auth::id())
+            ->where('status', $statusNum)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+            return view('attendance.application', compact('applications', 'status'));
+    }
+
     // 修正申請の作成
     public function store(Request $request, $id)
     {
@@ -39,41 +55,8 @@ class AttendanceCorrectionController extends Controller
                 }
             }
         });
-        return redirect()->route('attendance.detail', ['id' => $id])
+
+        return redirect()->route('attendance.application', ['tab' => 'pending'])
             ->with('success', '修正申請を送信しました。');
-    }
-
-    // 申請一覧（自分用 / 管理者用）
-    public function myRequestList() { /* 省略: 自分のデータを取得 */ }
-    public function adminRequestList()
-    {
-        $requests = AttendanceCorrection::with('user')->orderBy('created_at', 'desc')->get();
-        return view('admin.correction.list', compact('requests'));
-    }
-
-    // 承認処理（実績テーブルへの反映）
-    public function approve($id)
-    {
-        $corr = AttendanceCorrection::with('restCorrections')->findOrFail($id);
-
-        DB::transaction(function () use ($corr) {
-            $attendance = Attendance::findOrFail($corr->attendance_id);
-            $attendance->update([
-                'clock_in' => $corr->revised_clock_in,
-                'clock_out' => $corr->revised_clock_out,
-            ]);
-
-            // 休憩データを差し替え
-            $attendance->rests()->delete();
-            foreach ($corr->restCorrections as $rc) {
-                Rest::create([
-                    'attendance_id' => $attendance->id,
-                    'start_time' => $rc->revised_start_time,
-                    'end_time' => $rc->revised_end_time,
-                ]);
-            }
-            $corr->update(['status' => AttendanceCorrection::STATUS_APPROVED, 'approved_by' => Auth::id()]);
-        });
-        return redirect()->back();
     }
 }

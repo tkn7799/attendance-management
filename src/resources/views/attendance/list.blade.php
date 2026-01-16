@@ -40,20 +40,39 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($attendances as $attendance)
-                <tr>
-                    {{-- 日付表示（例: 06/01(木)） --}}
-                    <td class="table-date">
-                        {{ \Carbon\Carbon::parse($attendance->date)->isoFormat('MM/DD(ddd)') }}
-                    </td>
-                    <td>{{ $attendance->clock_in ? \Carbon\Carbon::parse($attendance->clock_in)->format('H:i') : '' }}</td>
-                    <td>{{ $attendance->clock_out ? \Carbon\Carbon::parse($attendance->clock_out)->format('H:i') : '' }}</td>
-                    <td>{{ $attendance->total_rest_duration ?? '0:00' }}</td>
-                    <td>{{ $attendance->total_work_duration ?? '0:00' }}</td>
-                    <td>
-                        <a href="{{ route('attendance.detail', ['id' => $attendance->id]) }}" class="detail-link">詳細</a>
-                    </td>
-                </tr>
+                {{-- 修正ポイント：$attendancesではなく、$datePeriod（1ヶ月分の日付）をループ --}}
+                @foreach($datePeriod as $date)
+                    @php
+                        $dateString = $date->toDateString();
+                        // その日のデータがあれば取得、なければnull
+                        $attendance = $attendances->get($dateString);
+                    @endphp
+                    <tr>
+                        {{-- 日付表示 --}}
+                        <td class="table-date">
+                            {{ $date->isoFormat('MM/DD(ddd)') }}
+                        </td>
+
+                        {{-- 出勤・退勤 --}}
+                        <td>{{ ($attendance && $attendance->clock_in) ? \Carbon\Carbon::parse($attendance->clock_in)->format('H:i') : '' }}</td>
+                        <td>{{ ($attendance && $attendance->clock_out) ? \Carbon\Carbon::parse($attendance->clock_out)->format('H:i') : '' }}</td>
+
+                        {{-- 休憩・合計 --}}
+                        <td>{{ $attendance->total_rest_duration ?? '' }}</td>
+                        <td>{{ $attendance->total_work_duration ?? '' }}</td>
+
+                        <td>
+                            {{-- 未来の日付でなければ詳細を表示 --}}
+                            @if(!$date->isFuture())
+                                @if($attendance)
+                                    <a href="{{ route('attendance.detail', ['id' => $attendance->id]) }}" class="detail-link">詳細</a>
+                                @else
+                                    {{-- データがない過去日の場合、日付をIDとして渡す（Controller側で日付を受け取れるようにする） --}}
+                                    <a href="{{ route('attendance.detail', ['id' => $dateString]) }}" class="detail-link">詳細</a>
+                                @endif
+                            @endif
+                        </td>
+                    </tr>
                 @endforeach
             </tbody>
         </table>

@@ -15,13 +15,13 @@
     <div class="attendance-list__nav">
         {{-- 前日リンク --}}
         <a href="{{ route('admin.attendance.list', ['date' => $date->copy()->subDay()->format('Y-m-d')]) }}" class="nav-link">← 前日</a>
-        
+
         {{-- 現在の日付表示 --}}
         <div class="current-date">
             <img src="{{ asset('img/climg.png') }}" alt="カレンダー" class="calendar-icon">
             <span>{{ $date->format('Y/m/d') }}</span>
         </div>
-        
+
         {{-- 翌日リンク --}}
         <a href="{{ route('admin.attendance.list', ['date' => $date->copy()->addDay()->format('Y-m-d')]) }}" class="nav-link">翌日 →</a>
     </div>

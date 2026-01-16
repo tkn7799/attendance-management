@@ -1,56 +1,55 @@
-.application-list__container {
-    max-width: 1000px;
-    margin: 40px auto;
-    padding: 0 20px;
+/* 画面全体の背景色（薄いグレー） */
+body {
+    background-color: #f2f2f2;
+    margin: 0;
+    font-family: "Noto Sans JP", sans-serif;
 }
 
-/* ページタイトル (左の黒線) */
+/* メインコンテナ */
+.application-list__container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 60px 20px;
+}
+
+/* タイトル：黒い太線 */
 .application-list__title {
     font-size: 24px;
     font-weight: bold;
-    border-left: 6px solid #000;
+    border-left: 5px solid #000000;
     padding-left: 15px;
     margin-bottom: 40px;
 }
 
 /* タブメニュー */
-.application-tabs {
+.tab-menu {
     display: flex;
-    border-bottom: 1px solid #cccccc;
+    gap: 40px;
+    border-bottom: 1px solid #e0e0e0;
     margin-bottom: 30px;
-    padding-left: 10px;
 }
 
-.tab-item {
+.tab-link {
     text-decoration: none;
-    color: #333;
+    color: #4b4b4b;
+    font-size: 14px;
     font-weight: bold;
-    font-size: 15px;
-    padding: 10px 40px;
+    padding: 10px 0;
     position: relative;
+    top: 1px;
 }
 
-/* アクティブなタブの下線 */
-.tab-item.is-active::after {
-    content: "";
-    position: absolute;
-    bottom: -1px;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background-color: #000;
+.tab-link.is-active {
+    color: #000000;
+    border-bottom: 2px solid #000000;
 }
 
-.tab-item:not(.is-active) {
-    color: #888;
-}
-
-/* 申請一覧テーブル */
-.application-table-container {
+/* --- 画像のキモ：白いテーブルボックス --- */
+.table-wrapper {
     background-color: #ffffff;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    border-radius: 5px;
     overflow: hidden;
+    border: 1px solid #e0e0e0;
 }
 
 .application-table {
@@ -58,31 +57,32 @@
     border-collapse: collapse;
 }
 
-.application-table th,
-.application-table td {
-    padding: 20px 15px;
-    text-align: center;
-    border-bottom: 1px solid #eeeeee;
-}
-
+/* テーブルヘッダーの見出し */
 .application-table th {
-    color: #888;
-    font-weight: 500;
+    text-align: left;
+    padding: 15px 20px;
     font-size: 14px;
+    color: #4b4b4b;
+    /* ヘッダー文字は少し薄め */
+    border-bottom: 1px solid #f0f0f0;
 }
 
+/* データ行 */
 .application-table td {
-    font-size: 15px;
-    color: #333;
+    padding: 15px 20px;
+    font-size: 14px;
+    color: #333333;
+    border-bottom: 1px solid #f0f0f0;
 }
 
-/* 詳細リンク */
+/* 最後の行の線は消す */
+.application-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* 詳細ボタン：太字 */
 .detail-link {
-    color: #000;
-    font-weight: bold;
+    color: #000000;
     text-decoration: none;
-}
-
-.detail-link:hover {
-    text-decoration: underline;
+    font-weight: bold;
 }

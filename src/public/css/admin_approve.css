@@ -1,87 +1,92 @@
-/* 背景とコンテナは共通のものをベースに微調整 */
+/* 共通背景設定 */
 body {
-    background-color: #f7f7f7;
+    background-color: #f2f2f2;
+    /* 画像通りの薄いグレー */
+    margin: 0;
 }
 
+/* コンテナ */
 .attendance-detail__container {
-    max-width: 800px;
-    margin: 50px auto;
+    max-width: 900px;
+    margin: 60px auto;
     padding: 0 20px;
 }
 
-/* タイトルバーの再現 */
+/* タイトル：黒い垂直線 */
 .attendance-detail__title {
     font-size: 24px;
     font-weight: bold;
-    border-left: 5px solid #000;
+    border-left: 5px solid #000000;
     padding-left: 15px;
     margin-bottom: 30px;
 }
 
-/* カードスタイル */
+/* 白いカード部分 */
 .attendance-detail__card {
-    background-color: #fff;
-    padding: 20px 40px;
-    border-radius: 4px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    background-color: #ffffff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
+/* 行のデザイン：上下の境界線 */
 .detail-row {
     display: flex;
+    border-bottom: 1px solid #e0e0e0;
+    min-height: 60px;
     align-items: center;
-    padding: 20px 0;
-    border-bottom: 1px solid #eee;
 }
 
-.no-border {
+.detail-row:last-child {
     border-bottom: none;
 }
 
+/* ラベル部分（左側） */
 .detail-label {
-    width: 200px;
+    width: 250px;
+    padding-left: 40px;
     font-weight: bold;
-    color: #333;
+    color: #4b4b4b;
+    font-size: 14px;
 }
 
+/* コンテンツ部分（右側） */
 .detail-content {
     flex: 1;
     display: flex;
+    gap: 20px;
     align-items: center;
+    font-weight: bold;
 }
 
 .text-data {
     font-size: 16px;
-    color: #333;
 }
 
 .symbol {
-    margin: 0 15px;
+    margin: 0 10px;
 }
 
-/* 備考欄のテキスト表示用スタイル */
+/* 備考欄のスタイル */
 .text-textarea {
     width: 100%;
-    padding: 10px;
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    min-height: 100px;
-    white-space: pre-wrap;
-    /* 改行を反映 */
+    padding: 10px 0;
 }
 
-/* 承認ボタン (黒背景) */
+/* フッターのボタン配置 */
 .form__footer {
-    margin-top: 30px;
     display: flex;
-    justify-content: center;
+    justify-content: flex-end;
+    /* 右寄せ */
+    margin-top: 30px;
 }
 
+/* 承認ボタン：通常時 */
 .approve-button {
-    background-color: #000;
-    color: #fff;
+    background-color: #000000;
+    color: #ffffff;
     border: none;
-    padding: 12px 80px;
+    padding: 12px 60px;
     font-size: 16px;
     font-weight: bold;
     border-radius: 4px;
@@ -93,7 +98,13 @@ body {
     opacity: 0.8;
 }
 
-/* 日付のスペース */
-.date-spacer {
-    margin-right: 15px;
+/* 承認済みボタン：非活性（画像 image_219147.png の色味） */
+.approve-button:disabled,
+.approve-button.is-approved {
+    background-color: #7b7b7b;
+    /* 画像通りのグレー */
+    color: #ffffff;
+    cursor: not-allowed;
+    /* クリック不可のカーソル */
+    opacity: 1;
 }

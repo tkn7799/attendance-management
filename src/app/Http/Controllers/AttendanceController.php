@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Attendance;
 use App\Models\Rest;
 use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 use Illuminate\Support\Facades\Auth;
 
 class AttendanceController extends Controller
@@ -54,21 +55,36 @@ class AttendanceController extends Controller
     public function list(Request $request)
     {
         $monthParam = $request->query('month', Carbon::today()->format('Y-m'));
-        $month = Carbon::parse($monthParam . '-01');
-        $attendances = Attendance::where('user_id', Auth::id())
-            ->where('date', 'like', $month->format('Y-m') . '%')
-            ->orderBy('date', 'asc')
-            ->get();
 
-        return view('attendance.list', compact('attendances', 'month'));
+        $month = \Carbon\Carbon::parse($monthParam . '-01');
+
+        $startOfMonth = $month->copy()->startOfMonth();
+        $endOfMonth = $month->copy()->endOfMonth();
+
+        $datePeriod = CarbonPeriod::create($startOfMonth, $endOfMonth);
+
+        $attendances = Attendance::where('user_id', Auth::id())
+            ->whereBetween('date', [$startOfMonth->toDateString(), $endOfMonth->toDateString()])
+            ->get()
+            ->keyBy(function($item) {
+                return is_string($item->date) ? $item->date : $item->date->format('Y-m-d');
+            });
+
+        return view('attendance.list', compact('month', 'datePeriod', 'attendances'));
     }
 
     public function detail($id)
     {
-        $attendance = Attendance::findOrFail($id);
+        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $id)) {
+            $attendance = Attendance::where('user_id', Auth::id())
+                ->where('date', $id)
+                ->firstOrFail();
+        } else {
+            $attendance = Attendance::with(['user', 'rests'])->findOrFail($id);
+        }
 
         $isPending = $attendance->correctionRequests()
-            ->where('status', 1)
+            ->where('status', 0)
             ->exists();
 
         return view('attendance.detail', compact('attendance', 'isPending'));
