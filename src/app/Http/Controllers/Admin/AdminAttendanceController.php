@@ -4,56 +4,153 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Models\Attendance;
+use App\Models\Rest;
 use App\Models\User;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use App\Http\Requests\AdminAttendanceUpdateRequest;
 
 class AdminAttendanceController extends Controller
 {
-    // PG08: 日次勤怠一覧（全スタッフ）
+    // 日次勤怠一覧（全スタッフ）
     public function dailyList(Request $request)
     {
         $dateParam = $request->query('date', Carbon::today()->toDateString());
         $date = Carbon::parse($dateParam);
 
-        $attendances = Attendance::with('user', 'rests')
-            ->whereDate('date', $date->toDateString())
+        $users = User::where('role', 2)
+            ->with(['attendances' => function($query) use ($date) {
+                $query->whereDate('date', $date->toDateString())->with('rests');
+            }])
             ->get();
 
-        return view('admin.attendance.daily', compact('attendances', 'date'));
+        return view('admin.attendance.daily', compact('users', 'date'));
     }
 
-    // PG10: スタッフ一覧
+    // スタッフ一覧
     public function staffList()
     {
-        $users = User::where('role', 'user')->get(); // 一般ユーザーのみ取得
+        $users = User::where('role', 2)->get();
         return view('admin.attendance.staff_list', compact('users'));
     }
 
-    // PG11: スタッフ別勤怠一覧（月次）
+    // スタッフ別勤怠一覧（月次）
     public function staffMonthlyList($id, Request $request)
     {
         $user = User::findOrFail($id);
         $monthParam = $request->query('month', Carbon::today()->format('Y-m'));
-        $month = Carbon::parse($monthParam . '-01');
+        $currentMonth = Carbon::parse($monthParam . '-01');
 
-        $attendances = Attendance::with('rests')
+        $prevMonth = $currentMonth->copy()->subMonth()->format('Y-m');
+        $nextMonth = $currentMonth->copy()->addMonth()->format('Y-m');
+
+        $attendanceData = Attendance::with('rests')
             ->where('user_id', $id)
-            ->whereMonth('date', $month->month)
-            ->whereYear('date', $month->year)
-            ->orderBy('date', 'asc')
-            ->get();
+            ->whereMonth('date', $currentMonth->month)
+            ->whereYear('date', $currentMonth->year)
+            ->get()
+            ->keyBy(function($item) {
+                return Carbon::parse($item->date)->format('Y-m-d');
+            });
 
-        return view('admin.attendance.staff_monthly', compact('user', 'attendances', 'month'));
+        $startOfMonth = $currentMonth->copy()->startOfMonth();
+        $endOfMonth = $currentMonth->copy()->endOfMonth();
+        $period = CarbonPeriod::create($startOfMonth, $endOfMonth);
+
+        $attendances = [];
+        foreach ($period as $date) {
+            $dateString = $date->toDateString();
+            $attendances[] = $attendanceData->has($dateString)
+                ? $attendanceData->get($dateString)
+                : new Attendance(['date' => $dateString, 'user_id' => $id]);
+        }
+
+        return view('admin.attendance.staff_monthly', compact('user', 'attendances', 'currentMonth', 'prevMonth', 'nextMonth'));
     }
 
-    // PG09: 勤怠詳細（閲覧用）
-    public function show($id)
+    // 勤怠詳細（閲覧用）
+    public function show(Request $request, $id = null)
     {
-        $attendance = Attendance::with(['user', 'rests'])->findOrFail($id);
-        return view('admin.attendance.detail', compact('attendance'));
+        if ($id) {
+            $attendance = Attendance::with(['user', 'rests', 'attendanceCorrection.restCorrections'])->findOrFail($id);
+
+            $isPending = $attendance->attendanceCorrection && $attendance->attendanceCorrection->status === 0;
+
+            if ($isPending) {
+                $correction = $attendance->attendanceCorrection;
+                $attendance->clock_in = $correction->revised_clock_in;
+                $attendance->clock_out = $correction->revised_clock_out;
+
+                $newRests = $correction->restCorrections->map(function ($rc) {
+                    return (object)[
+                        'start_time' => $rc->revised_start_time,
+                        'end_time' => $rc->revised_end_time,
+                    ];
+                });
+                $attendance->setRelation('rests', $newRests);
+
+                session()->now('info', '承認待ちのため修正はできません。');
+            }
+        } else {
+            $isPending = false;
+            $userId = $request->query('user_id');
+            $date = $request->query('date');
+
+            $user = User::findOrFail($userId);
+
+            $attendance = new Attendance([
+                'user_id' => $userId,
+                'date' => $date,
+                'clock_in' => null,
+                'clock_out' => null,
+            ]);
+            $attendance->setRelation('user', $user);
+            $attendance->setRelation('rests', collect());
+        }
+        return view('admin.attendance.detail', compact('attendance', 'isPending'));
+    }
+
+    public function update(AdminAttendanceUpdateRequest $request, $id)
+    {
+        $attendance = $id ? Attendance::findOrFail($id) : new Attendance();
+
+        DB::transaction(function () use ($request, $attendance) {
+            if (!$attendance->exists) {
+                $attendance->user_id = $request->user_id;
+                $attendance->date = $request->date;
+            }
+            $attendance->clock_in = $request->clock_in;
+            $attendance->clock_out = $request->clock_out;
+            $attendance->save();
+
+            $attendance->rests()->delete();
+            if ($request->has('rests')) {
+                foreach ($request->rests as $restData) {
+                    if (!empty($restData['start']) && !empty($restData['end'])) {
+                        $attendance->rests()->create([
+                            'start_time' => $restData['start'],
+                            'end_time' => $restData['end'],
+                        ]);
+                    }
+                }
+            }
+
+            \App\Models\AttendanceCorrection::updateOrCreate(
+                ['attendance_id' => $attendance->id],
+                [
+                    'user_id' => $attendance->user_id,
+                    'revised_clock_in' => $request->clock_in,
+                    'revised_clock_out' => $request->clock_out,
+                    'remarks' => $request->remarks,
+                    'status' => 1,
+                ]
+            );
+        });
+
+        return redirect()->back()->with('success', '勤怠情報を更新しました');
     }
 
     // CSV出力
@@ -87,8 +184,8 @@ class AdminAttendanceController extends Controller
                     $date->format('Y/m/d'),
                     $attendance && $attendance->clock_in ? Carbon::parse($attendance->clock_in)->format('H:i') : '',
                     $attendance && $attendance->clock_out ? Carbon::parse($attendance->clock_out)->format('H:i') : '',
-                    $attendance->total_rest_duration ?? '',
-                    $attendance->total_work_duration ?? '',
+                    $attendance ? $attendance->total_rest_duration : '',
+                    $attendance ? $attendance->total_work_duration : '',
                 ]);
             }
 

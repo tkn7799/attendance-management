@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 
 class AdminAttendanceCorrectionController extends Controller
 {
-    // PG12: 修正申請一覧（タブ切り替え対応）
+    // 修正申請一覧（タブ切り替え対応）
     public function index(Request $request)
     {
         // クエリパラメータ tab が 'approved' なら承認済み(1)、それ以外は承認待ち(0)
@@ -26,7 +26,7 @@ class AdminAttendanceCorrectionController extends Controller
         return view('admin.stamp_correction_request.index', compact('applications', 'status'));
     }
 
-    // PG13: 修正申請承認画面
+    // 修正申請承認画面
     public function show($attendance_correct_request_id)
     {
         $correction = AttendanceCorrection::with(['user', 'attendance', 'restCorrections'])
@@ -46,6 +46,7 @@ class AdminAttendanceCorrectionController extends Controller
             $attendance->update([
                 'clock_in' => $correction->revised_clock_in,
                 'clock_out' => $correction->revised_clock_out,
+                'remarks'   => $correction->remarks,
             ]);
 
             // 2. 休憩データを物理削除して、修正後の内容で再作成（入れ替え）

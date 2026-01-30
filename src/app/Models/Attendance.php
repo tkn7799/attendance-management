@@ -17,6 +17,8 @@ class Attendance extends Model
 
     protected $casts = [
         'date' => 'date',
+        'clock_in' => 'datetime',
+        'clock_out' => 'datetime',
     ];
 
     public function user()
@@ -41,17 +43,54 @@ class Attendance extends Model
         return $this->hasMany(AttendanceCorrection::class, 'attendance_id');
     }
 
+    public function attendanceCorrection()
+    {
+        return $this->hasOne(AttendanceCorrection::class, 'attendance_id')
+                    ->latestOfMany('id', 'max');
+    }
+
     // 合計休憩時間を計算 (秒)
-    public function getTotalRestDuration()
+    public function getTotalRestDurationAttribute()
     {
         $totalSeconds = 0;
         foreach ($this->rests as $rest) {
             if ($rest->start_time && $rest->end_time) {
-                $start = Carbon::parse($rest->start_time);
-                $end = Carbon::parse($rest->end_time);
-                $totalSeconds += $start->diffInSeconds($end);
+                $totalSeconds += \Carbon\Carbon::parse($rest->start_time)->diffInSeconds(\Carbon\Carbon::parse($rest->end_time));
             }
         }
-        return $totalSeconds;
+
+        $hours = floor($totalSeconds / 3600);
+        $minutes = floor(($totalSeconds % 3600) / 60);
+
+        return sprintf('%02d:%02d', $hours, $minutes);
+    }
+
+    public function getTotalWorkDurationAttribute()
+    {
+        if (!$this->clock_in || !$this->clock_out) {
+            return '';
+        }
+
+        $clockIn = \Carbon\Carbon::parse($this->clock_in);
+        $clockOut = \Carbon\Carbon::parse($this->clock_out);
+
+        $totalWorkSeconds = $clockIn->diffInSeconds($clockOut);
+
+        // 休憩時間を差し引く
+        $totalRestSeconds = 0;
+        foreach ($this->rests as $rest) {
+            if ($rest->start_time && $rest->end_time) {
+                $totalRestSeconds += \Carbon\Carbon::parse($rest->start_time)->diffInSeconds(\Carbon\Carbon::parse($rest->end_time));
+            }
+        }
+
+        $actualWorkSeconds = $totalWorkSeconds - $totalRestSeconds;
+
+        if ($actualWorkSeconds < 0) $actualWorkSeconds = 0;
+
+        $hours = floor($actualWorkSeconds / 3600);
+        $minutes = floor(($actualWorkSeconds % 3600) / 60);
+
+        return sprintf('%02d:%02d', $hours, $minutes);
     }
 }

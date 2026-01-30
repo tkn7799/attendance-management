@@ -6,16 +6,36 @@
 
 @section('content')
 <div class="attendance-detail__container">
-    {{-- ページタイトル --}}
+    @if(session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="alert alert-error">
+            {{ session('error') }}
+        </div>
+    @endif
+
     <div class="attendance-detail__header">
         <h1 class="attendance-detail__title">勤怠詳細</h1>
     </div>
 
-    {{-- 詳細・修正フォーム --}}
-    <form class="attendance-detail__form" action="{{ route('admin.attendance.update', ['id' => $attendance->id]) }}" method="post">
+    {{-- 保存・更新処理へのフォーム --}}
+    <form action="{{ route('admin.attendance.update', ['id' => $attendance->id]) }}" method="post">
         @csrf
+
+        {{-- 新規作成(勤怠データがない)場合、必要な情報を隠しデータで送る --}}
+        @if(!$attendance->id)
+            <input type="hidden" name="user_id" value="{{ request('user_id') }}">
+            <input type="hidden" name="date" value="{{ request('date') }}">
+        @else
+            <input type="hidden" name="date" value="{{ $attendance->date }}">
+        @endif
+
         <div class="attendance-detail__card">
-            {{-- 名前（テキスト表示） --}}
+            {{-- 名前行 --}}
             <div class="detail-row">
                 <div class="detail-label">名前</div>
                 <div class="detail-content">
@@ -23,60 +43,94 @@
                 </div>
             </div>
 
-            {{-- 日付（年/月/日の分割表示） --}}
+            {{-- 日付行 --}}
             <div class="detail-row">
                 <div class="detail-label">日付</div>
                 <div class="detail-content">
                     <span class="text-data">
-                        {{ $attendance->date->format('Y年') }}
-                        <span class="date-spacer"></span>
-                        {{ $attendance->date->format('n月j日') }}
+                        {{ \Carbon\Carbon::parse($attendance->date)->format('Y年') }}
+                        <span style="margin: 0 20px;"></span>
+                        {{ \Carbon\Carbon::parse($attendance->date)->format('n月j日') }}
                     </span>
                 </div>
             </div>
 
-            {{-- 出勤・退勤 --}}
+            {{-- 出勤・退勤 入力行 --}}
             <div class="detail-row">
                 <div class="detail-label">出勤・退勤</div>
                 <div class="detail-content">
-                    <input type="time" name="clock_in" class="input-time" value="{{ \Carbon\Carbon::parse($attendance->clock_in)->format('H:i') }}">
+                    @if($isPending)
+                        <span class="text-data">{{ $attendance->clock_in ? \Carbon\Carbon::parse($attendance->clock_in)->format('H:i') : '--:--' }}</span>
+                        <span class="symbol">～</span>
+                        <span class="text-data">{{ $attendance->clock_out ? \Carbon\Carbon::parse($attendance->clock_out)->format('H:i') : '--:--' }}</span>
+                    @else
+                    <input type="time" name="clock_in" class="input-field"
+                           value="{{ old('clock_in', $attendance->clock_in ? \Carbon\Carbon::parse($attendance->clock_in)->format('H:i') : '') }}">
                     <span class="symbol">～</span>
-                    <input type="time" name="clock_out" class="input-time" value="{{ $attendance->clock_out ? \Carbon\Carbon::parse($attendance->clock_out)->format('H:i') : '' }}">
+                    <input type="time" name="clock_out" class="input-field"
+                           value="{{ old('clock_out', $attendance->clock_out ? \Carbon\Carbon::parse($attendance->clock_out)->format('H:i') : '') }}">
+                    @error('clock_out')
+                        <p class="error-message">{{ $message }}</p>
+                    @enderror
+                    @endif
                 </div>
             </div>
 
-            {{-- 休憩（1回目） --}}
-            <div class="detail-row">
-                <div class="detail-label">休憩</div>
-                <div class="detail-content">
-                    <input type="time" name="rests[0][start]" class="input-time" value="{{ isset($attendance->rests[0]) ? \Carbon\Carbon::parse($attendance->rests[0]->start_time)->format('H:i') : '' }}">
-                    <span class="symbol">～</span>
-                    <input type="time" name="rests[0][end]" class="input-time" value="{{ isset($attendance->rests[0]->end_time) ? \Carbon\Carbon::parse($attendance->rests[0]->end_time)->format('H:i') : '' }}">
-                </div>
-            </div>
+            {{-- 休憩時間（1件目を代表で表示、複数ある場合はループ） --}}
+            @php
+                $rests = $attendance->rests;
+                $restCount = count($rests);
+                $loopCount = $isPending ? $restCount : $restCount + 1;
+            @endphp
 
-            {{-- 休憩2（2回目） --}}
-            <div class="detail-row">
-                <div class="detail-label">休憩2</div>
-                <div class="detail-content">
-                    <input type="time" name="rests[1][start]" class="input-time" value="{{ isset($attendance->rests[1]) ? \Carbon\Carbon::parse($attendance->rests[1]->start_time)->format('H:i') : '' }}">
-                    <span class="symbol">～</span>
-                    <input type="time" name="rests[1][end]" class="input-time" value="{{ isset($attendance->rests[1]->end_time) ? \Carbon\Carbon::parse($attendance->rests[1]->end_time)->format('H:i') : '' }}">
+            @for ($i = 0; $i <= $restCount; $i++)
+                <div class="detail-row">
+                    <div class="detail-label">休憩{{ $i === 0 ? '' : $i + 1 }}</div>
+                    <div class="detail-content">
+                        @if($isPending)
+                            @if(isset($rests[$i]))
+                                <span class="text-data">{{ \Carbon\Carbon::parse($rests[$i]->start_time)->format('H:i') }}</span>
+                                <span class="symbol">～</span>
+                                <span class="text-data">{{ \Carbon\Carbon::parse($rests[$i]->end_time)->format('H:i') }}</span>
+                            @endif
+                        @else
+                            <input type="time" name="rests[{{ $i }}][start]" class="input-field"
+                                   value="{{ old("rests.$i.start", isset($rests[$i]) ? \Carbon\Carbon::parse($rests[$i]->start_time)->format('H:i') : '') }}">
+                            <span class="symbol">～</span>
+                            <input type="time" name="rests[{{ $i }}][end]" class="input-field"
+                                   value="{{ old("rests.$i.end", isset($rests[$i]) ? \Carbon\Carbon::parse($rests[$i]->end_time)->format('H:i') : '') }}">
+                            @error("rests.$i.end")
+                                <p class="error-message">{{ $message }}</p>
+                            @enderror
+                        @endif
+                    </div>
                 </div>
-            </div>
+            @endfor
 
             {{-- 備考 --}}
-            <div class="detail-row no-border">
+            <div class="detail-row">
                 <div class="detail-label">備考</div>
                 <div class="detail-content">
-                    <textarea name="remarks" class="input-textarea">{{ $attendance->remarks }}</textarea>
+                    @if($isPending)
+                        <div class="text-data-area">
+                            {{ old('remarks', $attendance->attendanceCorrection->remarks ?? '') }}
+                        </div>
+                    @else
+                        <textarea name="remarks" class="text-textarea">{{ old('remarks', $attendance->remarks ?? $attendance->attendanceCorrection->remarks ?? '') }}</textarea>
+                        @error('remarks')
+                            <p class="error-message">{{ $message }}</p>
+                        @enderror
+                    @endif
                 </div>
             </div>
         </div>
 
-        {{-- 修正ボタン --}}
-        <div class="form__button">
-            <button type="submit" class="submit-button">修正</button>
+        <div class="form__footer">
+            @if($isPending)
+                <p class="error-text">承認待ちのため修正はできません。</p>
+            @else
+                <button type="submit" class="approve-button">修正</button>
+            @endif
         </div>
     </form>
 </div>

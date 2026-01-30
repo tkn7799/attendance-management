@@ -11,9 +11,9 @@
 
     {{-- タブメニュー --}}
     <div class="tab-menu">
-        <a href="{{ route('admin.correction.list', ['tab' => 'pending']) }}" 
+        <a href="{{ route('admin.correction.list', ['tab' => 'pending']) }}"
            class="tab-link {{ $status === 'pending' ? 'is-active' : '' }}">承認待ち</a>
-        <a href="{{ route('admin.correction.list', ['tab' => 'approved']) }}" 
+        <a href="{{ route('admin.correction.list', ['tab' => 'approved']) }}"
            class="tab-link {{ $status === 'approved' ? 'is-active' : '' }}">承認済み</a>
     </div>
 

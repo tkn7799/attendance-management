@@ -41,8 +41,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/attendance/list', [AttendanceController::class, 'list'])->name('attendance.list');
 
     // 勤怠詳細 / 修正申請
-    Route::get('/attendance/detail/{id}', [AttendanceController::class, 'detail'])->name('attendance.detail');
-    Route::post('/attendance/detail/{id}', [AttendanceCorrectionController::class, 'store'])->name('attendance.update');
+    Route::get('/attendance/detail/{id?}', [AttendanceController::class, 'detail'])->name('attendance.detail');
+    Route::post('/attendance/detail/{id?}', [AttendanceCorrectionController::class, 'store'])->name('attendance.update');
 
     // 申請一覧 (自分の申請)
     Route::get('/stamp_correction_request/list', [AttendanceCorrectionController::class, 'index'])->name('attendance.application');
@@ -59,23 +59,23 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/attendance/list', [AdminAttendanceController::class, 'dailyList'])->name('admin.attendance.list');
 
     // 勤怠詳細 (管理者用・直接修正)
-    Route::get('/attendance/{id}', [AdminAttendanceController::class, 'detail'])->name('admin.attendance.detail');
-    Route::post('/attendance/{id}', [AdminAttendanceController::class, 'update'])->name('admin.attendance.update');
+    Route::get('/attendance/detail/{id?}', [AdminAttendanceController::class, 'show'])->name('admin.attendance.detail');
+    Route::post('/attendance/update/{id?}', [AdminAttendanceController::class, 'update'])->name('admin.attendance.update');
 
     // スタッフ一覧
-    Route::get('/staff/list', [StaffController::class, 'index'])->name('admin.staff.list');
+    Route::get('/staff/list', [AdminAttendanceController::class, 'staffList'])->name('admin.staff.list');
 
     // スタッフ別勤怠一覧 (月次) & CSV出力
-    Route::get('/attendance/staff/{id}', [AdminAttendanceController::class, 'staffMonthlyList'])->name('admin.attendance.staff.list');
+    Route::get('/attendance/staff/{id}', [AdminAttendanceController::class, 'staffMonthlyList'])->name('admin.attendance.staff');
     Route::get('/attendance/staff/{id}/csv', [AdminAttendanceController::class, 'exportCsv'])->name('admin.attendance.staff.csv');
 
     // 申請一覧 (全スタッフの申請)
-    Route::get('/admin/stamp_correction_request/list', [AdminAttendanceCorrectionController::class, 'index'])
+    Route::get('/stamp_correction_request/list', [AdminAttendanceCorrectionController::class, 'index'])
     ->name('admin.correction.list');
 
     // 修正申請承認画面 / 承認処理
-    Route::get('/admin/stamp_correction_request/approve/{attendance_correct_request_id}', [AdminAttendanceCorrectionController::class, 'show'])
+    Route::get('/stamp_correction_request/approve/{attendance_correct_request_id}', [AdminAttendanceCorrectionController::class, 'show'])
     ->name('admin.correction.show_approve');
-    Route::post('/admin/stamp_correction_request/approve/{attendance_correct_request_id}', [AdminAttendanceCorrectionController::class, 'approve'])
+    Route::post('/stamp_correction_request/approve/{attendance_correct_request_id}', [AdminAttendanceCorrectionController::class, 'approve'])
     ->name('admin.correction.approve');
 });

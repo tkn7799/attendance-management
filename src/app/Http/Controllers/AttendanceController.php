@@ -13,9 +13,14 @@ class AttendanceController extends Controller
 {
     public function index()
     {
-        $user = Auth::user();
-        $today = Carbon::today()->format('Y-m-d');
+        $user = auth()->user();
+        $today = now()->toDateString();
+
         $attendance = Attendance::where('user_id', $user->id)->where('date', $today)->first();
+
+        if ($attendance && is_null($attendance->clock_in)) {
+            $attendance = null;
+        }
 
         return view('attendance.index', compact('attendance'));
     }
@@ -54,39 +59,44 @@ class AttendanceController extends Controller
 
     public function list(Request $request)
     {
-        $monthParam = $request->query('month', Carbon::today()->format('Y-m'));
+        $monthParam = $request->query('month', now()->format('Y-m'));
 
-        $month = \Carbon\Carbon::parse($monthParam . '-01');
+        $month = \Carbon\Carbon::parse($monthParam);
 
         $startOfMonth = $month->copy()->startOfMonth();
         $endOfMonth = $month->copy()->endOfMonth();
 
-        $datePeriod = CarbonPeriod::create($startOfMonth, $endOfMonth);
-
-        $attendances = Attendance::where('user_id', Auth::id())
+        $period = \Carbon\CarbonPeriod::create($startOfMonth, $endOfMonth);
+        $attendances = Attendance::where('user_id', auth()->id())
+            ->with('rests')
             ->whereBetween('date', [$startOfMonth->toDateString(), $endOfMonth->toDateString()])
             ->get()
             ->keyBy(function($item) {
-                return is_string($item->date) ? $item->date : $item->date->format('Y-m-d');
+                return \Carbon\Carbon::parse($item->date)->toDateString();
             });
 
-        return view('attendance.list', compact('month', 'datePeriod', 'attendances'));
+        return view('attendance.list', compact('attendances', 'period', 'month'));
     }
 
-    public function detail($id)
+    public function detail(Request $request, $id = null)
     {
-        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $id)) {
-            $attendance = Attendance::where('user_id', Auth::id())
-                ->where('date', $id)
-                ->firstOrFail();
-        } else {
+        if ($id) {
             $attendance = Attendance::with(['user', 'rests'])->findOrFail($id);
+        } else{
+            $date = $request->query('date');
+            if (!$date) {
+                return redirect()->route('attendance.list');
+            }
+
+            $attendance = new Attendance([
+                'date' => $date,
+                'user_id' => auth()->id(),
+            ]);
+
+            $attendance->setRelation('user', auth()->user());
+            $attendance->setRelation('rests', collect());
         }
 
-        $isPending = $attendance->correctionRequests()
-            ->where('status', 0)
-            ->exists();
-
-        return view('attendance.detail', compact('attendance', 'isPending'));
+        return view('attendance.detail', compact('attendance'));
     }
 }

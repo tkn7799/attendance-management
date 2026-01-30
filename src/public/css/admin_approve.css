@@ -1,7 +1,6 @@
 /* 共通背景設定 */
 body {
     background-color: #f2f2f2;
-    /* 画像通りの薄いグレー */
     margin: 0;
 }
 
@@ -77,7 +76,6 @@ body {
 .form__footer {
     display: flex;
     justify-content: flex-end;
-    /* 右寄せ */
     margin-top: 30px;
 }
 
@@ -98,7 +96,7 @@ body {
     opacity: 0.8;
 }
 
-/* 承認済みボタン：非活性（画像 image_219147.png の色味） */
+/* 承認済みボタン：非活性 */
 .approve-button:disabled,
 .approve-button.is-approved {
     background-color: #7b7b7b;

@@ -1,115 +1,203 @@
-.attendance-detail__container {
-    max-width: 900px;
-    margin: 40px auto;
-    padding: 0 20px;
+/* Google FontsからInterを読み込み */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f5f5f5;
+    /* 背景は薄いグレー */
 }
 
-/* タイトル (黒い縦線) */
+.attendance-detail__container {
+    max-width: 800px;
+    margin: 60px auto;
+}
+
+/* 勤怠詳細のタイトルの横にある黒い棒 */
 .attendance-detail__title {
     font-size: 24px;
     font-weight: bold;
-    border-left: 6px solid #000;
-    padding-left: 15px;
-    margin-bottom: 30px;
-}
-
-/* カード部分 */
-.attendance-detail__card {
-    background-color: #ffffff;
-    border-radius: 4px;
-    padding: 10px 40px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-/* 行のスタイル */
-.detail-row {
+    margin-bottom: 40px;
     display: flex;
     align-items: center;
-    padding: 25px 0;
-    border-bottom: 1px solid #eeeeee;
 }
 
-.no-border {
+.attendance-detail__title::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 30px;
+    background-color: #333;
+    margin-right: 15px;
+}
+
+/* 白いカード部分 */
+.attendance-detail__card {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* 各行のスタイル */
+.detail-row {
+    display: flex;
+    border-bottom: 1px solid #eee;
+    min-height: 60px;
+}
+
+.detail-row:last-child {
     border-bottom: none;
 }
 
-/* ラベル (左側) */
+/* 左側のラベル部分 */
 .detail-label {
     width: 250px;
+    padding: 20px 40px;
     color: #888;
-    font-weight: bold;
-    font-size: 15px;
-}
-
-/* コンテンツ (右側) */
-.detail-content {
-    flex: 1;
+    font-size: 14px;
     display: flex;
     align-items: center;
 }
 
+/* 右側の入力・表示エリア */
+.detail-content {
+    flex-grow: 1;
+    padding: 15px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+
+/* テキストデータのフォントを太く */
 .text-data {
+    font-weight: bold;
     font-size: 16px;
-    font-weight: bold;
-    color: #333;
-}
-
-.date-spacer {
-    display: inline-block;
-    width: 100px;
-    /* 年と月の間のスペース */
-}
-
-/*input[type="time"]::-webkit-calendar-picker-indicator {
-    display: none;
-}*/
-
-/* 入力フィールド */
-.input-time {
-    width: 100px;
-    padding: 8px;
-    border: 1px solid #dddddd;
-    border-radius: 4px;
-    font-family: inherit;
-    font-size: 15px;
-    text-align: center;
-/*    appearance: none;
-    -webkit-appearance: none;*/
-}
-
-.symbol {
-    margin: 0 20px;
-    font-weight: bold;
-}
-
-.input-textarea {
+    display: flex;
     width: 100%;
-    height: 100px;
-    padding: 10px;
-    border: 1px solid #dddddd;
+    justify-content: space-around;
+}
+
+/* 入力フィールドのスタイル */
+.input-field {
+    border: 1px solid #ddd;
     border-radius: 4px;
+    padding: 5px 10px;
+    font-family: 'Inter', sans-serif;
+    font-weight: bold;
+    width: 100px;
+    text-align: center;
+}
+
+.text-textarea {
+    width: 380px;
+    height: 120px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
     resize: none;
-    font-family: inherit;
+    box-sizing: border-box;
+    margin: 0 auto;
 }
 
-/* 修正ボタン */
-.form__button {
-    text-align: right;
+/* 備考の行だけ、中身を中央寄せにする */
+.detail-row:last-of-type .detail-content {
+    justify-content: center;
+    padding-right: 40px;
+}
+
+/* 修正ボタンのエリア（右寄せ） */
+.form__footer {
     margin-top: 30px;
+    display: flex;
+    justify-content: flex-end;
 }
 
-.submit-button {
-    background-color: #000000;
-    color: #ffffff;
+/* 修正ボタンのデザイン */
+.approve-button {
+    background-color: #000;
+    color: #fff;
     padding: 12px 60px;
     border: none;
     border-radius: 4px;
-    font-size: 16px;
+    font-size: 18px;
     font-weight: bold;
     cursor: pointer;
-    transition: opacity 0.3s;
+    font-family: 'Inter', sans-serif;
 }
 
-.submit-button:hover {
-    opacity: 0.8;
+.approve-button:disabled {
+    background-color: #ccc;
+}
+
+/* Chrome, Edge, Safari などの時計アイコンを消す */
+input[type="time"]::-webkit-calendar-picker-indicator {
+    display: none;
+    -webkit-appearance: none;
+}
+
+/* Firefox で時計アイコンが表示される場合の対応 */
+input[type="time"] {
+    appearance: none;
+    -moz-appearance: textfield;
+}
+
+/* 承認待ちメッセージのスタイル */
+.alert-info {
+    background-color: #e2f3f5;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+    text-align: center;
+    font-weight: bold;
+}
+
+/* 修正ボタン付近の警告テキスト */
+.error-text {
+    color: #ff0000;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 10px;
+}
+
+/* 修正不可時の入力欄の見た目 */
+input[readonly] {
+    background-color: #f9f9f9;
+    color: #888;
+    cursor: not-allowed;
+}
+
+/* 備考のテキスト表示用 */
+.text-data-area {
+    width: 100%;
+    min-height: 100px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    line-height: 1.6;
+    white-space: pre-wrap;
+}
+
+/* もしカードの上に謎の余白や要素が出る場合のリセット */
+.attendance-detail__card {
+    overflow: hidden;
+}
+
+.detail-content {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+
+.error-message {
+    width: 100%;
+    color: #ff0000;
+    font-size: 14px;
+    font-weight: bold;
+    margin-top: 5px;
+    order: 99;
 }

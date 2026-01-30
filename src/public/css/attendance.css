@@ -5,9 +5,7 @@
     align-items: center;
     justify-content: center;
     min-height: calc(100vh - 60px);
-    /* ヘッダーの高さを考慮 */
     background-color: #f3f3f3;
-    /* 画像のような薄いグレー背景 */
 }
 
 /* ステータスバッジ (丸角の小さなタグ) */
@@ -68,7 +66,6 @@
     background-color: #ffffff;
     color: #000000;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    /* 画像のような柔らかい影 */
 }
 
 .btn:hover {

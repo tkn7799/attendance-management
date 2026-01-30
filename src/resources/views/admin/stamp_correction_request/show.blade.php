@@ -11,7 +11,6 @@
         <h1 class="attendance-detail__title">勤怠詳細</h1>
     </div>
 
-    {{-- formの送信先は、既に定義されている admin.correction.approve --}}
     <form action="{{ route('admin.correction.approve', ['attendance_correct_request_id' => $correction->id]) }}" method="post">
         @csrf
         <div class="attendance-detail__card">
@@ -68,7 +67,7 @@
         </div>
 
         <div class="form__footer">
-            {{-- ステータスに応じてボタンを切り替え [FN051] --}}
+            {{-- ステータスに応じてボタンを切り替え --}}
             @if($correction->status === 0)
                 <button type="submit" class="approve-button">承認</button>
             @else
