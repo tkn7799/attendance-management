@@ -54,6 +54,12 @@ php artisan migrate
 php artisan db:seed
 ```
 
+9. 権限設定
+
+```
+chmod -R 777 storage bootstrap/cache
+```
+
 ### テスト用ユーザー情報
 
 1. 管理者太郎(管理者)
@@ -141,7 +147,6 @@ docker-compose exec php bash
 php artisan key:generate --env=testing
 php artisan config:clear
 php artisan migrate --env=testing
-chmod -R 777 storage bootstrap/cache
 ```
 
 3. テスト実行
