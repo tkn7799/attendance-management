@@ -1,8 +1,7 @@
 @extends('layouts.app')
 
 @section('css')
-<link rel="stylesheet" href="{{ asset('css/attendance_detail.css') }}">
-<link rel="stylesheet" href="{{ asset('css/admin_approve.css') }}">
+<link rel="stylesheet" href="{{ asset('css/admin_show.css') }}">
 @endsection
 
 @section('content')
@@ -48,14 +47,21 @@
             {{-- 休憩 (修正後の値) --}}
             @foreach($correction->restCorrections as $index => $rest)
             <div class="detail-row">
-                <div class="detail-label">休憩{{ $index + 1 }}</div>
+                <div class="detail-label">休憩{{ $index === 0 ? '' : $index + 1 }}</div>
                 <div class="detail-content">
-                    <span class="text-data">{{ \Carbon\Carbon::parse($rest->revised_start_time)->format('H:i') }}</span>
+                    <span class="text-data">{{ optional($rest->revised_start_time)->format('H:i') }}</span>
                     <span class="symbol">～</span>
-                    <span class="text-data">{{ \Carbon\Carbon::parse($rest->revised_end_time)->format('H:i') }}</span>
+                    <span class="text-data">{{ optional($rest->revised_end_time)->format('H:i') }}</span>
                 </div>
             </div>
             @endforeach
+
+            <div class="detail-row">
+                @php $nextCount = count($correction->restCorrections); @endphp
+                <div class="detail-label">休憩{{ $nextCount === 0 ? '' : $nextCount + 1 }}</div>
+                <div class="detail-content">
+                </div>
+            </div>
 
             {{-- 備考 --}}
             <div class="detail-row no-border">

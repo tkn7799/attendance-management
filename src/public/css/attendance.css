@@ -10,37 +10,36 @@
 
 /* ステータスバッジ (丸角の小さなタグ) */
 .attendance__status {
-    margin-bottom: 25px;
+    margin-bottom: 10px;
 }
 
 .status-tag {
     background-color: #cccccc;
-    /* 画像のステータス背景色 */
     color: #4b4b4b;
-    padding: 3px 18px;
+    padding: 10px 18px;
     border-radius: 20px;
-    font-size: 0.8rem;
+    font-size: 1rem;
     font-weight: bold;
 }
 
 /* 日付と時刻 */
 .attendance__info {
     text-align: center;
-    margin-bottom: 50px;
+    margin-bottom: 5px;
 }
 
 .attendance__date {
     font-size: 1.8rem;
     font-weight: 500;
     color: #333;
-    margin-bottom: 15px;
+    margin-bottom: 0;
 }
 
 .attendance__time {
     font-size: 5.5rem;
     font-weight: 700;
     color: #000;
-    line-height: 1;
+    line-height: 0.2;
 }
 
 /* ボタンの共通スタイル */
@@ -75,7 +74,7 @@
 /* ボタンが横に並ぶ設定 (退勤と休憩入) */
 .btn-group {
     display: flex;
-    gap: 30px;
+    gap: 60px;
 }
 
 /* 退勤後のメッセージ */

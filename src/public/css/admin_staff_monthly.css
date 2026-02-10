@@ -51,6 +51,7 @@
 .monthly-attendance__table {
     width: 100%;
     border-collapse: collapse;
+    font-weight: bold;
 }
 
 .monthly-attendance__table th,
@@ -58,11 +59,13 @@
     padding: 15px;
     text-align: center;
     border-bottom: 1px solid #eee;
+    font-weight: bold;
 }
 
 .monthly-attendance__table th {
     color: #888;
     font-size: 14px;
+    font-weight: bold;
 }
 
 .detail-link {

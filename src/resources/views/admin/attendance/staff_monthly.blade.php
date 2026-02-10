@@ -44,8 +44,16 @@
                     <td>{{ $date->format('m/d') }}({{ $dayOfWeek }})</td>
                     <td>{{ $attendance->clock_in ? \Carbon\Carbon::parse($attendance->clock_in)->format('H:i') : '' }}</td>
                     <td>{{ $attendance->clock_out ? \Carbon\Carbon::parse($attendance->clock_out)->format('H:i') : '' }}</td>
-                    <td>{{ $attendance->id ? $attendance->total_rest_duration : '' }}</td>
-                    <td>{{ $attendance->id ? $attendance->total_work_duration : '' }}</td>
+                    <td>
+                        @if($attendance->clock_in && $attendance->clock_out)
+                            {{ $attendance->total_rest_duration }}
+                        @endif
+                    </td>
+                    <td>
+                        @if($attendance->clock_in && $attendance->clock_out)
+                            {{ $attendance->total_work_duration }}
+                        @endif
+                    </td>
 
                     {{-- 詳細リンク --}}
                     <td>

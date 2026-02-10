@@ -5,7 +5,7 @@
 }
 
 .staff-list__title {
-    font-size: 24px;
+    font-size: 30px;
     font-weight: bold;
     border-left: 4px solid #000;
     padding-left: 15px;
@@ -27,14 +27,14 @@
 .staff-list__table th,
 .staff-list__table td {
     padding: 15px;
-    text-align: left;
+    text-align: center;
     border-bottom: 1px solid #eee;
 }
 
 .staff-list__table th {
     color: #888;
     font-weight: bold;
-    font-size: 14px;
+    font-size: 16px;
 }
 
 .staff-list__table tr:last-child td {
@@ -51,7 +51,7 @@
     color: #333;
     text-decoration: none;
     font-weight: bold;
-    font-size: 14px;
+    font-size: 16px;
 }
 
 .detail-link:hover {

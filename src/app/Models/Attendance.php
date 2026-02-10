@@ -52,15 +52,15 @@ class Attendance extends Model
     // 合計休憩時間を計算 (秒)
     public function getTotalRestDurationAttribute()
     {
-        $totalSeconds = 0;
+        $totalMinutes = 0;
         foreach ($this->rests as $rest) {
             if ($rest->start_time && $rest->end_time) {
-                $totalSeconds += \Carbon\Carbon::parse($rest->start_time)->diffInSeconds(\Carbon\Carbon::parse($rest->end_time));
+               $totalMinutes += $rest->start_time->diffInMinutes($rest->end_time);
             }
         }
 
-        $hours = floor($totalSeconds / 3600);
-        $minutes = floor(($totalSeconds % 3600) / 60);
+        $hours = floor($totalMinutes / 60);
+        $minutes = $totalMinutes % 60;
 
         return sprintf('%02d:%02d', $hours, $minutes);
     }

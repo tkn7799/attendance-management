@@ -72,6 +72,7 @@ body {
     font-size: 14px;
     color: #333333;
     border-bottom: 1px solid #f0f0f0;
+    font-weight: bold;
 }
 
 /* 最後の行の線は消す */

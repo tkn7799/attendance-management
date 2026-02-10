@@ -1,0 +1,123 @@
+/* 全体の背景色 */
+body {
+    background-color: #f5f5f5;
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+}
+
+.attendance-detail__container {
+    max-width: 900px;
+    margin: 60px auto;
+    padding: 0 20px;
+}
+
+/* タイトル (左の黒線) */
+.attendance-detail__title {
+    font-size: 24px;
+    font-weight: bold;
+    border-left: 6px solid #000;
+    padding-left: 15px;
+    margin-bottom: 30px;
+    line-height: 1.2;
+}
+
+/* 白いカード */
+.attendance-detail__card {
+    background-color: #ffffff;
+    border-radius: 4px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    padding: 10px 40px;
+    /* 内側の余白 */
+}
+
+/* 各行のレイアウト */
+.detail-row {
+    display: flex;
+    align-items: center;
+    min-height: 70px;
+    border-bottom: 1px solid #eeeeee;
+}
+
+/* 最後の行の線は消す */
+.detail-row.no-border {
+    border-bottom: none;
+}
+
+/* 左側のラベル */
+.detail-label {
+    width: 200px;
+    font-size: 16px;
+    color: #888;
+    font-weight: 500;
+}
+
+/* 右側のコンテンツ */
+.detail-content {
+    flex-grow: 1;
+    padding: 15px 40px;
+    justify-content: space-around;
+    /* 内容を中央へ */
+    align-items: center;
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* 日付の年・月日の間のスペース */
+.date-spacer {
+    display: inline-block;
+    width: 120px;
+}
+
+/* ～ 記号 */
+.symbol {
+    margin: 0 60px;
+    font-weight: normal;
+}
+
+/* 備考欄のテキスト表示 */
+.text-textarea {
+    width: 100%;
+    line-height: 1.6;
+    text-align: left;
+}
+
+/* --- ボタンエリア (カードの外側) --- */
+.form__footer {
+    margin-top: 30px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.approve-button {
+    width: 150px;
+    padding: 10px 20px;
+    font-size: 22px;
+    font-weight: bold;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+/* 承認ボタン：黒背景・白文字 */
+.approve-button {
+    background-color: #000000;
+    color: #ffffff;
+}
+
+.approve-button:hover {
+    background-color: #333333;
+}
+
+/* 承認済みボタン：グレー背景・白文字 */
+.approve-button.is-approved {
+    background-color: #bbbbbb;
+    color: #ffffff;
+    cursor: not-allowed;
+}
+
+.approve-button:disabled {
+    pointer-events: none;
+    opacity: 0.7;
+}

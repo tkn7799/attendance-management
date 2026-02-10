@@ -39,7 +39,7 @@
                     <td>{{ $application->remarks }}</td>
                     <td>{{ $application->created_at->format('Y/m/d') }}</td>
                     <td>
-                        <a href="{{ route('attendance.detail', ['id' => $application->attendance_id]) }}" class="detail-link">詳細</a>
+                        <a href="{{ route('attendance.detail', ['id' => $application->attendance_id, 'mode' => 'pending']) }}" class="detail-link">詳細</a>
                     </td>
                 </tr>
                 @endforeach

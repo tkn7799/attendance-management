@@ -61,9 +61,11 @@
                         <td>
                             @if($date->lte(now()))
                                 @if($attendance)
-                                    <a href="{{ route('attendance.detail', ['id' => $attendance->id]) }}" class="detail-link">詳細</a>
+                                    {{-- すでに勤怠データがある場合 --}}
+                                    <a href="{{ route('attendance.detail', ['id' => $attendance->id, 'mode' => 'original']) }}" class="detail-link">詳細</a>
                                 @else
-                                <a href="{{ route('attendance.detail', ['date' => $dateString]) }}" class="detail-link">詳細</a>
+                                    {{-- 勤怠データがない（新規作成）場合 --}}
+                                    <a href="{{ route('attendance.detail', ['date' => $dateString, 'mode' => 'original']) }}" class="detail-link">詳細</a>
                                 @endif
                             @endif
                         </td>

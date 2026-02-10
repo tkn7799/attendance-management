@@ -80,18 +80,6 @@ class AdminAttendanceController extends Controller
             $isPending = $attendance->attendanceCorrection && $attendance->attendanceCorrection->status === 0;
 
             if ($isPending) {
-                $correction = $attendance->attendanceCorrection;
-                $attendance->clock_in = $correction->revised_clock_in;
-                $attendance->clock_out = $correction->revised_clock_out;
-
-                $newRests = $correction->restCorrections->map(function ($rc) {
-                    return (object)[
-                        'start_time' => $rc->revised_start_time,
-                        'end_time' => $rc->revised_end_time,
-                    ];
-                });
-                $attendance->setRelation('rests', $newRests);
-
                 session()->now('info', '承認待ちのため修正はできません。');
             }
         } else {
@@ -113,7 +101,7 @@ class AdminAttendanceController extends Controller
         return view('admin.attendance.detail', compact('attendance', 'isPending'));
     }
 
-    public function update(AdminAttendanceUpdateRequest $request, $id)
+    public function update(AdminAttendanceUpdateRequest $request, $id = null)
     {
         $attendance = $id ? Attendance::findOrFail($id) : new Attendance();
 
@@ -124,21 +112,12 @@ class AdminAttendanceController extends Controller
             }
             $attendance->clock_in = $request->clock_in;
             $attendance->clock_out = $request->clock_out;
+            $attendance->remarks = $request->remarks;
             $attendance->save();
 
             $attendance->rests()->delete();
-            if ($request->has('rests')) {
-                foreach ($request->rests as $restData) {
-                    if (!empty($restData['start']) && !empty($restData['end'])) {
-                        $attendance->rests()->create([
-                            'start_time' => $restData['start'],
-                            'end_time' => $restData['end'],
-                        ]);
-                    }
-                }
-            }
 
-            \App\Models\AttendanceCorrection::updateOrCreate(
+            $correction = \App\Models\AttendanceCorrection::updateOrCreate(
                 ['attendance_id' => $attendance->id],
                 [
                     'user_id' => $attendance->user_id,
@@ -148,6 +127,24 @@ class AdminAttendanceController extends Controller
                     'status' => 1,
                 ]
             );
+
+            $correction->restCorrections()->delete();
+
+            if ($request->has('rests')) {
+                foreach ($request->rests as $restData) {
+                    if (!empty($restData['start']) && !empty($restData['end'])) {
+                        $attendance->rests()->create([
+                            'start_time' => $restData['start'],
+                            'end_time' => $restData['end'],
+                        ]);
+
+                        $correction->restCorrections()->create([
+                            'revised_start_time' => $restData['start'],
+                            'revised_end_time' => $restData['end'],
+                        ]);
+                    }
+                }
+            }
         });
 
         return redirect()->back()->with('success', '勤怠情報を更新しました');

@@ -10,7 +10,7 @@ body {
 .header {
     background-color: #000000;
     height: 60px;
-    padding: 0 50px;
+    padding: 0 50px 0 10px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -34,6 +34,7 @@ body {
 /* ナビゲーションの配置 */
 .header-nav {
     display: flex;
+    flex-wrap: nowrap;
     align-items: center;
     gap: 40px;
 }
@@ -41,9 +42,10 @@ body {
 .header-nav__item {
     display: flex;
     align-items: center;
+    white-space: nowrap;
 }
 
-/* ナビゲーション（文字サイズも少し調整してバランスを取る） */
+/* ナビゲーション */
 .header-nav__link,
 .header-nav__button {
     color: #ffffff;
@@ -52,6 +54,7 @@ body {
     background: none;
     border: none;
     cursor: pointer;
+    text-decoration: none;
 }
 
 .header-nav__link:hover,
@@ -62,4 +65,30 @@ body {
 /* メインコンテンツエリア */
 main {
     padding-top: 0;
+}
+
+@media screen and (max-width: 1024px) {
+    .header {
+        justify-content: flex-start;
+        gap: 5px;
+        padding-left: 10px;
+    }
+
+    .header__logo {
+        margin-right: 0;
+    }
+    .header__logo img {
+        height: 30px;
+    }
+
+    .header-nav {
+        gap: 10px;
+        padding-left: 0;
+        margin-left: -60px;
+    }
+
+    .header-nav__item:first-child .header-nav__link,
+    .header-nav__item:first-child .header-nav__button {
+        padding-left: 0;
+    }
 }

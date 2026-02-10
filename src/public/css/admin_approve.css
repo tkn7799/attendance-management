@@ -100,7 +100,6 @@ body {
 .approve-button:disabled,
 .approve-button.is-approved {
     background-color: #7b7b7b;
-    /* 画像通りのグレー */
     color: #ffffff;
     cursor: not-allowed;
     /* クリック不可のカーソル */

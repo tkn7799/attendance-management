@@ -9,6 +9,11 @@ class Rest extends Model
 {
     protected $fillable = ['attendance_id', 'start_time', 'end_time'];
 
+    protected $casts = [
+        'start_time' => 'datetime',
+        'end_time' => 'datetime',
+    ];
+
     public function attendance()
     {
         return $this->belongsTo(Attendance::class);
