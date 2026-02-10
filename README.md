@@ -20,7 +20,7 @@ cp .env.example .env
 exit
 ```
 
-5. .env に以下の環境変数を追加
+4. .env に以下の環境変数を追加
 
 ```
 DB_CONNECTION=mysql
@@ -34,7 +34,7 @@ MAIL_FROM_ADDRESS="admin@example.com"
 
 ```
 
-6. アプリケーションキーの作成
+5. アプリケーションキーの作成
 
 PHP コンテナ上
 
@@ -42,19 +42,19 @@ PHP コンテナ上
 php artisan key:generate
 ```
 
-7. マイグレーションの実行
+6. マイグレーションの実行
 
 ```
 php artisan migrate
 ```
 
-8. シーディングの実行
+7. シーディングの実行
 
 ```
 php artisan db:seed
 ```
 
-9. 権限設定
+8. 権限設定
 
 ```
 chmod -R 777 storage bootstrap/cache
