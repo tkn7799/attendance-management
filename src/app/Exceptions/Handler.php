@@ -37,5 +37,12 @@ class Handler extends ExceptionHandler
         $this->reportable(function (Throwable $e) {
             //
         });
+
+        $this->renderable(function (\Illuminate\Session\TokenMismatchException $e, $request) {
+            if ($request->is('admin/*') || $request->is('admin')) {
+                return redirect()->route('admin.login')->with('message', 'セッションが切れました。');
+            }
+            return redirect()->route('login')->with('message', 'セッションが切れました。');
+        });
     }
 }

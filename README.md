@@ -141,6 +141,7 @@ docker-compose exec php bash
 php artisan key:generate --env=testing
 php artisan config:clear
 php artisan migrate --env=testing
+chmod -R 777 storage bootstrap/cache
 ```
 
 3. テスト実行
