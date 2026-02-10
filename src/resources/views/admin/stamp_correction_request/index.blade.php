@@ -7,7 +7,7 @@
 
 @section('content')
 <div class="application-list__container">
-    <h1 class="application-list__title">修正申請一覧</h1>
+    <h1 class="application-list__title">申請一覧</h1>
 
     {{-- タブメニュー --}}
     <div class="tab-menu">

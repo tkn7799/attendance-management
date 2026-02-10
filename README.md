@@ -12,9 +12,8 @@
 ### Laravel 環境構築
 
 1. docker-compose exec php bash
-2. cd attendance-management/
-3. composer install
-4. PHP コンテナ上で実行
+2. composer install
+3. PHP コンテナ上で実行
 
 ```
 cp .env.example .env
@@ -69,7 +68,7 @@ php artisan db:seed
 ```
 メールアドレス：user1@example.com
 パスワード：password123
-2025年1月と2026年1月分の勤怠データあり
+2025年12月と2026年1月分の勤怠データあり
 ```
 
 3. テストユーザー2
@@ -77,7 +76,7 @@ php artisan db:seed
 ```
 メールアドレス：user2@example.com
 パスワード：password123
-2025年1月と2026年1月分の勤怠データあり
+2025年12月と2026年1月分の勤怠データあり
 ```
 
 ## テストの実施方法
@@ -85,7 +84,10 @@ php artisan db:seed
 1. テスト用データベースの準備
 
 MySQL コンテナ上
+
+```
 docker-compose exec mysql bash
+```
 
 ```
 mysql -u root -p
@@ -131,6 +133,9 @@ APP_URL=http://localhost
 - DB_DATABASE=laravel_db
 + DB_DATABASE=demo_test
 ```
+
+PHP コンテナ上
+docker-compose exec php bash
 
 ```
 php artisan key:generate --env=testing
